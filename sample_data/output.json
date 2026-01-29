@@ -1,0 +1,72 @@
+{
+  "id": 1,
+  "url": "https://en.wikipedia.org/wiki/Alan_Turing",
+  "title": "Alan Turing",
+  "summary": "Alan Mathison Turing OBE was an English mathematician, computer scientist, logician, cryptanalyst, philosopher, and theoretical biologist. Turing was highly influential in the development of theoretical computer science, providing a formalisation of the concepts of algorithm and computation with the Turing machine, which can be considered a model of a general-purpose computer...",
+  "sections": [
+    "Early life",
+    "World War II",
+    "Computing",
+    "Artificial intelligence",
+    "Conviction and legacy"
+  ],
+  "quiz": [
+    {
+      "question": "What was Alan Turing's primary contribution to cryptography during World War II?",
+      "options": [
+        "Invented the Enigma machine",
+        "Worked on breaking the Enigma code at Bletchley Park",
+        "Designed radar systems",
+        "Developed jet engine technology"
+      ],
+      "answer": "Worked on breaking the Enigma code at Bletchley Park",
+      "difficulty": "medium",
+      "explanation": "Turing was a key figure in the effort to break the German Enigma code at Bletchley Park during World War II, which is detailed in the World War II section."
+    },
+    {
+      "question": "What is the Turing machine?",
+      "options": [
+        "A mechanical computing device",
+        "A theoretical model of a general-purpose computer",
+        "The first electronic computer ever built",
+        "A secret encryption device"
+      ],
+      "answer": "A theoretical model of a general-purpose computer",
+      "difficulty": "medium",
+      "explanation": "The Turing machine, discussed in the Computing section, is a mathematical abstraction that formalized the concepts of algorithm and computation."
+    },
+    {
+      "question": "What is the Turing Test?",
+      "options": [
+        "A test for breaking codes",
+        "A proposal for testing machine intelligence",
+        "A cryptographic verification method",
+        "An early computer security measure"
+      ],
+      "answer": "A proposal for testing machine intelligence",
+      "difficulty": "easy",
+      "explanation": "The Turing Test, mentioned in the Artificial intelligence section, is a test of a machine's ability to exhibit human-level intelligence."
+    },
+    {
+      "question": "In what year was Alan Turing born?",
+      "options": [
+        "1912",
+        "1915",
+        "1920",
+        "1925"
+      ],
+      "answer": "1912",
+      "difficulty": "easy",
+      "explanation": "Alan Turing was born on June 23, 1912, as mentioned in the Early life section."
+    }
+  ],
+  "related_topics": [
+    "Cryptography",
+    "Enigma machine",
+    "Computer science",
+    "Artificial intelligence",
+    "Turing test",
+    "Computational theory"
+  ],
+  "created_at": "2024-01-29T10:30:00"
+}

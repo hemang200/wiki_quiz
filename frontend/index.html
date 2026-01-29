@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki Quiz Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 3px solid #f0f0f0;
+            background: #f9f9f9;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 18px 30px;
+            border: none;
+            background: transparent;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fee;
+            border-left: 4px solid #f44;
+            color: #c33;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #efe;
+            border-left: 4px solid #4f4;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-card {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .quiz-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .quiz-card p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .options {
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .option {
+            padding: 10px;
+            margin: 8px 0;
+            background: #f5f5f5;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: #efefef;
+            border-color: #667eea;
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .option.incorrect {
+            background: #f44;
+            color: white;
+            border-color: #f44;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .difficulty.easy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .difficulty.medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .difficulty.hard {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .explanation {
+            background: #e7f3ff;
+            border-left: 4px solid #2196f3;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 4px;
+            color: #0c5aa0;
+            font-size: 0.95em;
+        }
+
+        .related-topics {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .related-topics h4 {
+            color: #667eea;
+            margin-bottom: 12px;
+        }
+
+        .topic-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .topic-tag {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .topic-tag:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 3px solid #e0e0e0;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: transparent;
+            color: white;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            transform: none;
+            box-shadow: none;
+            opacity: 0.8;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-primary {
+            flex: 1;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 5px 20px rgba(108, 117, 125, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                padding: 15px;
+                border-bottom: 3px solid transparent;
+                border-right: 3px solid transparent;
+            }
+
+            .tab-button.active {
+                border-right-color: #667eea;
+                border-bottom-color: transparent;
+            }
+
+            .modal-content {
+                max-width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Wiki Quiz Generator</h1>
+            <p>Generate quizzes from Wikipedia articles powered by AI</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('generate')">
+                ✨ Generate Quiz
+            </button>
+            <button class="tab-button" onclick="switchTab('history')">
+                📋 History
+            </button>
+        </div>
+
+        <!-- TAB 1: GENERATE QUIZ -->
+        <div id="generate" class="tab-content active">
+            <div id="generateError" class="error" style="display:none;"></div>
+
+            <div class="form-group">
+                <label for="wikiUrl">📖 Wikipedia Article URL</label>
+                <input 
+                    type="text" 
+                    id="wikiUrl" 
+                    placeholder="e.g., https://en.wikipedia.org/wiki/Alan_Turing"
+                >
+            </div>
+
+            <button onclick="generateQuiz()">
+                🚀 Generate Quiz
+            </button>
+
+            <div class="loading" id="generateLoading">
+                <span class="spinner"></span>
+                Generating quiz... This may take a moment.
+            </div>
+
+            <div id="generateResult"></div>
+        </div>
+
+        <!-- TAB 2: HISTORY -->
+        <div id="history" class="tab-content">
+            <div id="historyError" class="error" style="display:none;"></div>
+
+            <button onclick="loadHistory()">📚 Load History</button>
+
+            <div class="loading" id="historyLoading">
+                <span class="spinner"></span>
+                Loading quizzes...
+            </div>
+
+            <div id="historyResult"></div>
+        </div>
+    </div>
+
+    <!-- MODAL FOR DETAILS -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-btn" onclick="closeModal()">✕</button>
+                <h2 id="modalTitle"></h2>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8000/api";
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function generateQuiz() {
+            const url = document.getElementById('wikiUrl').value.trim();
+            const errorDiv = document.getElementById('generateError');
+            const resultDiv = document.getElementById('generateResult');
+            const loadingDiv = document.getElementById('generateLoading');
+
+            // Clear previous results
+            errorDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+
+            // Validate URL
+            if (!url) {
+                errorDiv.textContent = '❌ Please enter a Wikipedia URL';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            if (!url.includes('wikipedia.org/wiki/')) {
+                errorDiv.textContent = '❌ Please enter a valid Wikipedia URL (https://en.wikipedia.org/wiki/...)';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                loadingDiv.classList.add('show');
+
+                const response = await fetch(`${API_URL}/generate-quiz`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to generate quiz');
+                }
+
+                const data = await response.json();
+                loadingDiv.classList.remove('show');
+
+                displayQuiz(data, resultDiv);
+
+            } catch (error) {
+                loadingDiv.classList.remove('show');
+                errorDiv.textContent = `❌ Error: ${error.message}`;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function displayQuiz(data, container) {
+            let html = `
+                <div class="success">✅ Quiz generated successfully!</div>
+                <div class="quiz-card">
+                    <h2>${data.title}</h2>
+                    <p><strong>URL:</strong> ${data.url}</p>
+                    <p><strong>Summary:</strong> ${data.summary.substring(0, 200)}...</p>
+            `;
+
+            if (data.sections && data.sections.length > 0) {
+                html += `<p><strong>Sections:</strong> ${data.sections.join(', ')}</p>`;
+            }
+
+            html += '</div>';
+
+            // Display quiz questions
+            if (data.quiz && data.quiz.length > 0) {
+                data.quiz.forEach((q, idx) => {
+                    html += `
+                        <div class="quiz-card">
+                            <h3>Question ${idx + 1}: ${q.question}
+                                <span class="difficulty ${q.difficulty}">${q.difficulty.toUpperCase()}</span>
+                            </h3>
+                            <div class="options">
+                                ${q.options.map((opt, i) => `
+                                    <div class="option">${String.fromCharCode(65 + i)}. ${opt}</div>
+                                `).join('')}
+                            </div>
+                            <div class="explanation">
+                                <strong>✓ Answer:</strong> ${q.answer}<br>
+                                <strong>📝 Explanation:</strong> ${q.explanation}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Display related topics
+            if (data.related_topics && data.related_topics.length > 0) {
+                html += `
+                    <div class="related-topics">
+                        <h4>🔗 Related Topics</h4>
+                        <div class="topic-list">
+                            ${data.related_topics.map(topic => `
+                                <div class="topic-tag">${topic}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        async function loadHistory() {
+            const errorDiv = document.getElementById('historyError');
+            const resultDiv = document.getElementById('historyResult');
+            const loadingDiv = document.getElementById('historyLoading');
+
+            errorDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+
+            try {
+                loadingDiv.classList.add('show');
+
+                const response = await fetch(`${API_URL}/history`);
+                if (!response.ok) throw new Error('Failed to load history');
+
+                const data = await response.json();
+                loadingDiv.classList.remove('show');
+
+                if (data.length === 0) {
+                    resultDiv.innerHTML = '<p style="text-align:center; color:#999;">No quizzes yet. Generate one first!</p>';
+                    return;
+                }
+
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Article Title</th>
+                                <th>URL</th>
+                                <th>Created</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                data.forEach(item => {
+                    const date = new Date(item.created_at).toLocaleDateString();
+                    const urlShort = item.url.replace('https://en.wikipedia.org/wiki/', '');
+                    html += `
+                        <tr>
+                            <td>${item.title}</td>
+                            <td><small>${urlShort}</small></td>
+                            <td>${date}</td>
+                            <td>
+                                <button class="btn-secondary" onclick="viewDetails(${item.id})">
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += '</tbody></table>';
+                resultDiv.innerHTML = html;
+
+            } catch (error) {
+                loadingDiv.classList.remove('show');
+                errorDiv.textContent = `❌ Error: ${error.message}`;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        async function viewDetails(quizId) {
+            try {
+                const response = await fetch(`${API_URL}/quiz/${quizId}`);
+                if (!response.ok) throw new Error('Failed to load quiz details');
+
+                const data = await response.json();
+
+                // Populate modal
+                document.getElementById('modalTitle').textContent = data.title;
+                
+                let html = `
+                    <p><strong>URL:</strong> ${data.url}</p>
+                    <p><strong>Summary:</strong> ${data.summary}</p>
+                `;
+
+                if (data.sections && data.sections.length > 0) {
+                    html += `<p><strong>Sections:</strong> ${data.sections.join(', ')}</p>`;
+                }
+
+                // Display quiz questions
+                if (data.quiz && data.quiz.length > 0) {
+                    data.quiz.forEach((q, idx) => {
+                        html += `
+                            <div class="quiz-card">
+                                <h4>Question ${idx + 1}: ${q.question}
+                                    <span class="difficulty ${q.difficulty}">${q.difficulty.toUpperCase()}</span>
+                                </h4>
+                                <div class="options">
+                                    ${q.options.map((opt, i) => `
+                                        <div class="option">${String.fromCharCode(65 + i)}. ${opt}</div>
+                                    `).join('')}
+                                </div>
+                                <div class="explanation">
+                                    <strong>✓ Answer:</strong> ${q.answer}<br>
+                                    <strong>📝 Explanation:</strong> ${q.explanation}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Display related topics
+                if (data.related_topics && data.related_topics.length > 0) {
+                    html += `
+                        <div class="related-topics">
+                            <h4>🔗 Related Topics</h4>
+                            <div class="topic-list">
+                                ${data.related_topics.map(topic => `
+                                    <div class="topic-tag">${topic}</div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('modalBody').innerHTML = html;
+                document.getElementById('detailsModal').classList.add('show');
+
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('detailsModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailsModal') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
