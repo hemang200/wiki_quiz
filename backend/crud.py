@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models import Article
-from schemas import QuizResponse
+from .models import Article
+from .schemas import QuizResponse
 import logging
 
 logger = logging.getLogger(__name__)

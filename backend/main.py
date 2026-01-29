@@ -10,10 +10,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Import our modules
-from scraper import scrape_wikipedia, extract_key_entities
-from llm import generate_quiz
-from schemas import QuizResponse, QuizHistoryItem, GenerateQuizRequest
+# Import our modules (package-relative)
+from .scraper import scrape_wikipedia, extract_key_entities
+from .llm import generate_quiz
+from .schemas import QuizResponse, QuizHistoryItem, GenerateQuizRequest
 
 # Setup
 logging.basicConfig(level=logging.INFO)
