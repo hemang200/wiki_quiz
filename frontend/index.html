@@ -522,7 +522,10 @@
     </div>
 
     <script>
-        const API_URL = "http://localhost:8000/api";
+        // Use production URL from environment or fallback to localhost
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? "http://localhost:8000/api"
+            : "https://wiki-quiz-api.onrender.com/api";
 
         function switchTab(tabName) {
             // Hide all tabs

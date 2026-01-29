@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Using SQLite for easy setup (can switch to PostgreSQL later)
+# Database configuration - supports both SQLite and PostgreSQL
 DATABASE_URL = os.getenv(
     "DATABASE_URL", 
     "sqlite:///./wikiquiz.db"
@@ -17,7 +17,12 @@ if DATABASE_URL.startswith("sqlite"):
         connect_args={"check_same_thread": False}
     )
 else:
-    engine = create_engine(DATABASE_URL)
+    # PostgreSQL on Render
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,
+        pool_recycle=300
+    )
 
 SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
 
