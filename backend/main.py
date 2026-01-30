@@ -93,6 +93,11 @@ async def root():
     return {"status": "✅ Wiki Quiz API is running"}
 
 
+@app.options("/{path_name:path}")
+async def preflight_handler(path_name: str):
+    """Handle CORS preflight requests"""
+    return {"status": "ok"}
+
 @app.post("/api/generate-quiz")
 async def generate_quiz_endpoint(request: GenerateQuizRequest):
     """
